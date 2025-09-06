@@ -1,44 +1,54 @@
-**##Tier-3 Layer Application on AWS EC2 – Custom VPC##**
-Let’s say I want to deploy a simple Python Flask-based application which has the main application logic code acting as the middleware (back-end) between the front-end and database.
-Then I will deploy a front-end web server acting as the presentation layer, which will serve a normal HTML page showing a link to the application page, connected to the back-end server.
-Finally, I will deploy a database server which is connected to the back-end server.
+**Tier-3 Layer Application on AWS EC2 – Custom VPC**
 
-**Traffic Flow of this Application**
-**User (Client) Browser → Front-end Server → Back-end Server → Database Server**
-Whenever the user hits the front-end server URL, it redirects to the back-end, then to the database server, and finally shows “connected to DB” (as per code definition) if all goes well.
+I recently deployed a simple Python Flask application on AWS following the classic 3-tier architecture:
 
-**Points to Understand for Flow of Application.**
-User connects to the front-end because the front-end web server allows connections via HTTP/80 publicly (0.0.0.0/0).
-Then the front-end connects to the back-end because of the logic defined in the front-end HTML configuration to redirect to the back-end.
-The back-end allows connection requests from the front-end and redirects to the database because of the logic defined in the back-end Python application code (allowing traffic from the front-end and connecting to the DB).
-Finally, it shows “connected to DB” because the database server allows connection requests from the back-end using the user defined for the DB (and the same user is configured in the back-end).
-**
-**Default VPC Setup****
-This complete setup worked for me when I did it on AWS in the default VPC (Public Subnet).
-**
-**Custom VPC Setup****
-Then I tried to do this in my own VPC (Public/Private subnet) where all servers (Front-end, Back-end, DB) were kept in the Private subnet (not accessible via public, no route to IGW).
-In general, this was not possible since my front-end server, which is now in private, could not be accessed via Browser (Internet).
+🔹 Front-end (Presentation Layer): Web server serving HTML and redirecting to backend
+🔹 Back-end (Application Layer): Flask app acting as middleware with logic to connect DB
+🔹 Database (Data Layer): DB server accessed only via backend
+
+**Traffic Flow**
+
+**User Browser → Front-end → Back-end → Database → Response
+If all works, the app shows “connected to DB”.**
+
+**Default VPC Setup**
+
+This worked fine in the default VPC (public subnet) where all servers were accessible.
+
+**Custom VPC Setup (Challenge)**
+
+In a custom VPC (public + private subnets), I placed all servers in the private subnet.
+For Custom VPC configure I followed very simple setup .
+<img width="792" height="427" alt="image" src="https://github.com/user-attachments/assets/90df66cb-789d-414c-b305-071d384d6307" />
+
+<img width="784" height="440" alt="image" src="https://github.com/user-attachments/assets/b0e27d3e-b425-46d5-9ba9-65e6d8b6f12e" />
+
+
+Note- I kept only 1 NAT Gateway , All private subnets Instances will be able to access interent via NAT Gatway ..Since NAT Gateway is payble servcie so I kept only one.
+
+For high availbility need to defined per AZ.
+
+
+👉 **Problem: The front-end was no longer accessible from the internet.**
 
 **Solution**
-To fix this, I needed a common entry point for user-facing traffic that redirects requests to the front-end, then back-end, and DB.
-For this issue, a Load Balancer came into the picture. I added it in the public subnet, in front of the front-end server. The Load Balancer is public facing of user requests and balancing the traffic by forwarding requests to front-end servers in a managed manner.
-New Traffic Flow of this Application (Private Subnet Setup)
-User (Client) Browser → Front-end Load Balancer (Public Subnet) → 2-Front-end (Private Subnet) →2 Back-end (Private Subnet) → Database (Private Subnet)
-So lets start this setup and deployment.
 
-**Infracture Setup-**
-Custom VPC setup//
-Just search VPC in your favaroute Region and click on creation then select VPC with more it will auto configure all by next-2 click .
-Remember avoid S3 and NAT gateway is paid AWS service so be carefull and delete while lab is done.
+I added an Application Load Balancer (ALB) in the public subnet as the single entry point with manage of loads on server.
+**New Flow:
+User Browser → ALB (Public Subnet) → Front-end (Private) → Back-end (Private) → Database (Private)**
 
-**Servers Setup//**
-2 Front-end Server for high availbility purpose in different-2 AZ-Private Subnet
-2 Back-end server for high availbility purpose in different-2 AZ
-1 DB server in private Subnet kept it as simple
-1 ALB in public subnet
-1 EC2 in public subnet as Bastaion server to configure packages on all servers in private subnet
+Infra Setup (Simplified)
 
+2 Front-end servers (private, different AZs)
 
-1 DB server (I kept it simple as of now)
-1-ALB in Public subnet 
+2 Back-end servers (private, different AZs)
+
+1 Database server (private)
+
+1 ALB (public subnet)
+
+1 Bastion Host (public subnet, for secure access to private servers for configuration).
+
+⚠️ Note: Avoid enabling S3 .
+
+✅ This project helped me practice high availability setup and secure architecture in AWS using custom VPC.
