@@ -19,15 +19,14 @@ This worked fine in the default VPC (public subnet) where all servers were acces
 
 In a custom VPC (public + private subnets), I placed all servers in the private subnet.
 For Custom VPC configure I followed very simple setup .
+
 <img width="792" height="427" alt="image" src="https://github.com/user-attachments/assets/90df66cb-789d-414c-b305-071d384d6307" />
 
 <img width="784" height="440" alt="image" src="https://github.com/user-attachments/assets/b0e27d3e-b425-46d5-9ba9-65e6d8b6f12e" />
 
+After creation Successfully creation =>
 
-Note- I kept only 1 NAT Gateway , All private subnets Instances will be able to access interent via NAT Gatway ..Since NAT Gateway is payble servcie so I kept only one.
-
-For high availbility need to defined per AZ.
-
+<img width="807" height="413" alt="image" src="https://github.com/user-attachments/assets/f965e830-73f1-4dc3-8111-89f2f845b4f6" />
 
 👉 **Problem: The front-end was no longer accessible from the internet.**
 
@@ -49,6 +48,11 @@ Infra Setup (Simplified)
 
 1 Bastion Host (public subnet, for secure access to private servers for configuration).
 
-⚠️ Note: Avoid enabling S3 .
 
-✅ This project helped me practice high availability setup and secure architecture in AWS using custom VPC.
+****Note-**
+**1-I kept only 1 NAT Gateway , All private subnets Instances will be able to access interent via NAT Gatway ..Since NAT Gateway is payble servcie so I kept only one.
+2-For high availbility need to define NAT Gateway per AZ.
+3-⚠️ Note: Avoid enabling S3 .
+4- I also ignore Load Balancer for back-end since I made Front -end server  as reverse poxy .** **to avoid Load balancer charage for demo purpose.**
+
+**✅ This project helped me practice high availability setup and secure architecture in AWS using custom VPC.****
