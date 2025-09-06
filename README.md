@@ -48,6 +48,9 @@ Infra Setup (Simplified)
 
 1 Bastion Host (public subnet, for secure access to private servers for configuration).
 
+<img width="621" height="154" alt="image" src="https://github.com/user-attachments/assets/0c07a111-5028-4a1e-8828-0fbb3e8b23b6" />
+
+
 
 ****Note-**
 **1-I kept only 1 NAT Gateway , All private subnets Instances will be able to access interent via NAT Gatway ..Since NAT Gateway is payble servcie so I kept only one.
